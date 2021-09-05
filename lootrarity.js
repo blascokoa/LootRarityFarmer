@@ -58,6 +58,7 @@ async function level_up(id) {
       console.log("ID:%s | class: %s - Level[%s], XP=[%s] | Required XP: [%s]", loot_members[i], loot_class.toNumber(), loot_level, loot_exp/1000000000000000000, loot_exp_req/1000000000000000000);
       if (loot_exp >= loot_exp_req){
             console.log("Upgrade level");
+            await level_up(loot_members[i]);
             nonce++;
       }
       await adventure(loot_members[i]);
