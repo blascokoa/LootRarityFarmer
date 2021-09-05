@@ -57,13 +57,12 @@ async function level_up(id) {
       const loot_exp_req = await lootcontract.xp_required(loot_members[i]);
 
       console.log("ID:%s | class: %s - Level[%s], XP=[%s] | Required XP: [%s]", loot_members[i], loot_class.toNumber(), loot_level, loot_exp/1000000000000000000, loot_exp_req/1000000000000000000);
-      if (loot_exp >= loot_exp_req){
-            console.log("Upgrade level");
+      if ((loot_exp_req - loot_exp) <= 0){
+            console.log("Upgrade level!");
             // Upgrade Level
             await level_up(loot_members[i]);
             nonce++;
       }
-      // Go to Farm
       await adventure(loot_members[i]);
       nonce++;
     } catch(e) {
