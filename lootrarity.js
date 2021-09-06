@@ -5,7 +5,9 @@
  * 4. Add the ID of your LOOTRARITY Tokens
  * 5. Run: node lootrarity.js
  */
-
+let keys = require('dotenv').config({path: __dirname + '/.env'});
+const pvt_key = keys.parsed.PVT_KEY;
+const loot_members = keys.parsed.LOOT_IDS.split(",").map(Number)
 const ethers = require("ethers");
 const { parseUnits } = require("@ethersproject/units");
 
@@ -59,11 +61,10 @@ async function claim_gold(id){
 }
 
 (async () => {
-  wallet = new ethers.Wallet("PRIVATE KEY", provider);
+  wallet = new ethers.Wallet(pvt_key, provider);
   // get the nonce
   nonce = await provider.getTransactionCount(wallet.address);
   // Define Loot IDs
-  const loot_members = ["INSERT HERE THE ID OF YOUR TOKENS"]; // [11224, 11233, 11255]
   for (let i = 0; i <loot_members.length ; i++) {
     try {
       // Get Display Info

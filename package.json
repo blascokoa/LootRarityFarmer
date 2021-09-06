@@ -1,16 +1,17 @@
 {
-  "name": "untitled",
-  "version": "1.0.0",
-  "description": "",
+  "name": "loot_rarity_farmer",
+  "version": "0.1.0",
+  "description": "Script for farm XP and Gold from Loot&Rarity Project",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "https://twitter.com/0xBlasco",
   "license": "ISC",
   "dependencies": {
     "@ethersproject/units": "^5.4.0",
+    "dotenv": "^10.0.0",
     "ethers": "^5.4.6"
   }
 }
