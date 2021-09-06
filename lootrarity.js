@@ -65,12 +65,9 @@ async function claim_gold(id){
     // get the nonce
     nonce = await provider.getTransactionCount(wallet.address);
 
-  // console.log(ethers.utils.formatUnits(gasPrice, "gwei"));
-  // Define Loot IDs
-    for (let i = 0; i <loot_members.length ; i++) {
+    for (let i = 0; i < loot_members.length ; i++) {
         try {
             // Get Display Info
-            console.log(gas);
             const loot_class = await lootContract.class(loot_members[i]);
             let loot_level = await lootContract.level(loot_members[i]);
             const loot_exp = await lootContract.xp(loot_members[i]);
@@ -80,16 +77,16 @@ async function claim_gold(id){
             if ((loot_exp_req - loot_exp) <= 0){
                 console.log("Upgrade level!");
                 // Upgrade Level
-                // await level_up(loot_members[i]);
+                await level_up(loot_members[i]);
                 nonce++;
             }
             loot_level = await lootContract.level(loot_members[i]);
             if (loot_level >= 2){
               // Claim Gold
-              // await claim_gold(loot_members[i])
+              await claim_gold(loot_members[i])
             }
             // Claim xp
-            // await adventure(loot_members[i]);
+            await adventure(loot_members[i]);
             nonce++;
         } catch(e) {
             console.log("Error Happened: %s", e);
