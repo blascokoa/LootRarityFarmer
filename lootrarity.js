@@ -54,7 +54,7 @@ async function level_up(id) {
       const loot_class = await lootcontract.class(loot_members[i]);
       const loot_level = await lootcontract.level(loot_members[i]);
       const loot_exp = await lootcontract.xp(loot_members[i]);
-      const loot_exp_req = await lootcontract.xp_required(loot_members[i]);
+      const loot_exp_req = await lootcontract.xp_required(loot_level);
 
       console.log("ID:%s | class: %s - Level[%s], XP=[%s] | Required XP: [%s]", loot_members[i], loot_class.toNumber(), loot_level, loot_exp/1000000000000000000, loot_exp_req/1000000000000000000);
       if ((loot_exp_req - loot_exp) <= 0){
