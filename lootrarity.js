@@ -286,11 +286,11 @@ const cellarContract = new ethers.Contract(
   account
 );
 
-function gasChecker(gasPrice){
-    if (formatUnits(gasPrice, "gwei") > GAS_THRESHOLD) {
-        return true;
-    }
-    return false;
+function gasChecker(gasPrice) {
+  if (Number(formatUnits(gasPrice, "gwei")) < Number(GAS_THRESHOLD)) {
+    return true;
+  }
+  return false;
 }
 
 async function adventure(id) {
@@ -461,5 +461,6 @@ const main = async () => {
         await farm();
     }
 }
+  if (Number(formatUnits(gasPrice, "gwei")) > Number(GAS_THRESHOLD)) {
 
 main();
