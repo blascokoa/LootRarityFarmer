@@ -16,9 +16,9 @@ const GAS_THRESHOLD = keys.parsed.GAS_THRESHOLD ?? "60"
 const GAS_MULTIPLIER = parseFloat(keys.parsed.GAS_MULTIPLIER ?? "1.00")
 
 // Provider
-const provider = new ethers.providers.JsonRpcProvider("https://rpcapi.fantom.network/");
 const wallet = new ethers.Wallet(PVT_KEY, provider)
 const account = wallet.connect(provider)
+const provider = new ethers.providers.JsonRpcProvider("https://rpc.ftm.tools/");
 
 // LootRarity contract
 const lootContract = new ethers.Contract(
