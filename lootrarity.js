@@ -7,6 +7,7 @@
  */
 const ethers = require("ethers");
 const { parseUnits, formatUnits } = require("@ethersproject/units");
+var colors = require('colors');
 
 let keys = require('dotenv').config({path: __dirname + '/.env'});
 const PVT_KEY = keys.parsed.PVT_KEY;
@@ -34,7 +35,7 @@ const goldContract = new ethers.Contract(
 
 
 function gasChecker(gasPrice){
-    if (gasPrice > parseUnits(GAS_THRESHOLD, "gwei")) {
+    if (formatUnits(gasPrice, "gwei") > GAS_THRESHOLD) {
         return true;
     }
     return false;
@@ -44,7 +45,7 @@ async function adventure(id) {
     // get the data for the tx
     const gasPrice = await provider.getGasPrice();
     if (gasChecker(gasPrice)){
-        console.log("Sending tx | GasNow = %s gwei -> Using = %s gwei",
+        console.log("Sending tx | GasNow = %s gwei -> Using = %s gwei".green,
                 formatUnits(gasPrice, 'gwei'),
                 formatUnits(gasPrice, 'gwei')*GAS_MULTIPLIER
             );
@@ -61,7 +62,7 @@ async function adventure(id) {
         console.log("ID %s went to farm XP - Transaction receipt: %s", id, receipt);
     }
     else {
-        console.log("Damm! Gas too high! [%s]", formatUnits(gasPrice, 'gwei'))
+        console.log("Damm! Gas too high! [%s]".red, formatUnits(gasPrice, 'gwei'))
     }
 }
 
@@ -125,29 +126,27 @@ const farm = async () => {
             const nextAdventureTime = await lootContract.adventurers_log(LOOT_MEMBERS[i]);
             const now = Date.now();
 
-            if (now < nextAdventureTime.toNumber() * 1000) {
-                console.log('ID %s is not ready to adventure', LOOT_MEMBERS[i]);
-                console.log('Next Adventure Time: ', new Date(nextAdventureTime.toNumber() * 1000).toString());
-                continue;
-            }
-            console.log('ID %s is ready to adventure', LOOT_MEMBERS[i]);
-
             // Get Display Info
             const loot_class = await lootContract.class(LOOT_MEMBERS[i]);
             let loot_level = await lootContract.level(LOOT_MEMBERS[i]);
             const loot_exp = await lootContract.xp(LOOT_MEMBERS[i]);
             const loot_exp_req = await lootContract.xp_required(loot_level);
             console.log(
-                "ID:%s | class: %s - Level[%s], XP=[%s] | Required XP: [%s]",
-                LOOT_MEMBERS[i],
-                loot_class.toNumber(),
-                loot_level,
-                loot_exp/1000000000000000000,
-                loot_exp_req/1000000000000000000
+                `ID:${LOOT_MEMBERS[i]} |`.yellow,
+                `class: ${loot_class.toNumber()}`.green," - ",
+                `Level[${loot_level}]`.blue,
+                "|", `XP:[${loot_exp/1000000000000000000}] | Required XP: [${loot_exp_req/1000000000000000000}]`.magenta,
             );
 
+            if (now < nextAdventureTime.toNumber() * 1000) {
+                console.log(`ID ${LOOT_MEMBERS[i]} |`.yellow, " NOT ready to adventure".bold.red);
+                console.log('Next Adventure Time:'.cyan , new Date(nextAdventureTime.toNumber() * 1000).toString());
+                continue;
+            }
+            console.log('ID %s is ready to adventure'.bold.green, LOOT_MEMBERS[i]);
+
             if ((loot_exp_req - loot_exp) <= 0){
-                console.log("Upgrade level!");
+                console.log("Upgrade level!".green);
                 // Upgrade Level
                 await level_up(LOOT_MEMBERS[i]);
             }
@@ -163,13 +162,14 @@ const farm = async () => {
             console.log("Error Happened: %s", e);
         }
     }
+    console.log('--------------------------------------------------');
 };
 
 const main = async () => {
-    console.log('--------------- LOOT&RARITY Farmer --------------');
+    console.log('--------------- LOOT&RARITY Farmer ---------------'.bold.cyan);
     console.log("GAS_THRESHOLD:", GAS_THRESHOLD, "| GAS_MULTIPLIER:", GAS_MULTIPLIER);
     const gasPrice = await provider.getGasPrice();
-    if (gasPrice > parseUnits(GAS_THRESHOLD, "gwei")) {
+    if (formatUnits(gasPrice, "gwei") > GAS_THRESHOLD) {
         console.log("Gas Price is too damn high: %s", formatUnits(gasPrice, "gwei"));
     }
     else {
