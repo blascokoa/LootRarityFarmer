@@ -79,6 +79,7 @@ async function adventure_cellar(id) {
   if (gasChecker(gasPrice)) {
     const scoutResult = await cellarContract.scout(id);
     if (scoutResult.gt(ethers.BigNumber.from(0))) {
+      console.log("ID %s is ready for The Cellar".bold.green, id);
       console.log(
         "Sending tx | GasNow = %s gwei -> Using = %s gwei".green,
         formatUnits(gasPrice, "gwei"),
