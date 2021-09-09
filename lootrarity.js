@@ -218,6 +218,34 @@ const farm = async () => {
       }
       // Claim xp
       await adventure(LOOT_MEMBERS[i]);
+    } catch (e) {
+      console.log("Error Happened: %s", e);
+    }
+  }
+  console.log("--------------------------------------------------");
+};
+
+const cellar = async () => {
+  for (let i = 0; i < LOOT_MEMBERS.length; i++) {
+    console.log("--------------------------------------------------");
+    try {
+      // Time to farm checker
+      const nextAdventureTime = await cellarContract.adventurers_log(
+        LOOT_MEMBERS[i]
+      );
+      const now = Date.now();
+
+      if (now < nextAdventureTime.toNumber() * 1000) {
+        console.log(
+          `ID ${LOOT_MEMBERS[i]} |`.yellow,
+          " NOT ready for The Cellar".bold.red
+        );
+        console.log(
+          "Next The Cellar Time:".cyan,
+          new Date(nextAdventureTime.toNumber() * 1000).toString()
+        );
+        continue;
+      }
       // Send to The Cellar
       await adventure_cellar(LOOT_MEMBERS[i]);
     } catch (e) {
@@ -243,6 +271,7 @@ const main = async () => {
     );
   } else {
     await farm();
+    await cellar();
   }
 };
 
