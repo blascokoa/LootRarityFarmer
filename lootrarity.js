@@ -102,6 +102,7 @@ async function adventure_cellar(id) {
       );
     } else {
       console.log(
+        `ID ${id} |`.yellow,
         "You are not eligible for any loot from The Cellar, skipping summoner.."
       );
     }
@@ -168,7 +169,7 @@ async function claim_gold(id) {
 
 const farm = async () => {
   for (let i = 0; i < LOOT_MEMBERS.length; i++) {
-    console.log("--------------------------------------------------");
+
     try {
       // Time to farm checker
       const nextAdventureTime = await lootContract.adventurers_log(
@@ -181,29 +182,18 @@ const farm = async () => {
       let loot_level = await lootContract.level(LOOT_MEMBERS[i]);
       const loot_exp = await lootContract.xp(LOOT_MEMBERS[i]);
       const loot_exp_req = await lootContract.xp_required(loot_level);
+      const gold_balance = await goldContract.balanceOf(LOOT_MEMBERS[i])
       console.log(
         `ID:${LOOT_MEMBERS[i]} |`.yellow,
-        `class: ${loot_class.toNumber()}`.green,
+        `Class: ${loot_class.toNumber()}`.green,
         " - ",
         `Level[${loot_level}]`.blue,
         "|",
         `XP:[${loot_exp / 1000000000000000000}] | Required XP: [${
           loot_exp_req / 1000000000000000000
-        }]`.magenta
+        }]`.magenta,
+        `GOLD: [${gold_balance/ 1000000000000000000}]`.bold.yellow
       );
-
-      if (now < nextAdventureTime.toNumber() * 1000) {
-        console.log(
-          `ID ${LOOT_MEMBERS[i]} |`.yellow,
-          " NOT ready to adventure".bold.red
-        );
-        console.log(
-          "Next Adventure Time:".cyan,
-          new Date(nextAdventureTime.toNumber() * 1000).toString()
-        );
-        continue;
-      }
-      console.log("ID %s is ready to adventure".bold.green, LOOT_MEMBERS[i]);
 
       if (loot_exp_req - loot_exp <= 0) {
         console.log("Upgrade level!".green);
@@ -214,20 +204,51 @@ const farm = async () => {
       loot_level = await lootContract.level(LOOT_MEMBERS[i]);
       if (loot_level >= 2) {
         // Claim Gold
-        await claim_gold(LOOT_MEMBERS[i]);
+        let gold = checkGold(LOOT_MEMBERS[i]);
+        gold.then(async function(result) {
+          if(result){
+            console.log("Claiming Gold!".bold.yellow);
+            await claim_gold(LOOT_MEMBERS[i]);
+          }
+          else{
+            console.log(`ID ${LOOT_MEMBERS[i]} |`.yellow,"No gold to claim ser...".bold.white);
+            console.log("--------------------------------------------------");
+          }
+        })
+
       }
+
+      // Check if its ready for the adventure
+      if (now < nextAdventureTime.toNumber() * 1000) {
+        console.log(
+          `ID ${LOOT_MEMBERS[i]} |`.yellow,
+          "NOT ready to adventure".bold.red
+        );
+        console.log(
+          `ID ${LOOT_MEMBERS[i]} |`.yellow,
+          "Next Adventure Time:".cyan,
+          new Date(nextAdventureTime.toNumber() * 1000).toString()
+        );
+        continue;
+      }
+      console.log("ID %s is ready to adventure".bold.green, LOOT_MEMBERS[i]);
+
       // Claim xp
       await adventure(LOOT_MEMBERS[i]);
     } catch (e) {
-      console.log("Error Happened: %s", e);
+      console.log("Error Happened: %s".red.bold, e);
     }
   }
-  console.log("--------------------------------------------------");
 };
+
+async function checkGold(id) {
+  const gold_available = await goldContract.claimable(id)
+  return Number(gold_available)
+}
 
 const cellar = async () => {
   for (let i = 0; i < LOOT_MEMBERS.length; i++) {
-    console.log("--------------------------------------------------");
+    //console.log("--------------------------------------------------");
     try {
       // Time to farm checker
       const nextAdventureTime = await cellarContract.adventurers_log(
@@ -238,7 +259,7 @@ const cellar = async () => {
       if (now < nextAdventureTime.toNumber() * 1000) {
         console.log(
           `ID ${LOOT_MEMBERS[i]} |`.yellow,
-          " NOT ready for The Cellar".bold.red
+          "NOT ready for The Cellar".bold.red
         );
         console.log(
           "Next The Cellar Time:".cyan,
@@ -249,7 +270,7 @@ const cellar = async () => {
       // Send to The Cellar
       await adventure_cellar(LOOT_MEMBERS[i]);
     } catch (e) {
-      console.log("Error Happened: %s", e);
+      console.log("Error Happened: %s".red.bold, e);
     }
   }
   console.log("--------------------------------------------------");
